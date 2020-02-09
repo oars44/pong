@@ -4,13 +4,17 @@ using UnityEngine;
 
 public class ball_control : MonoBehaviour
 {
+    public GameObject ball;
     public float start_speed = 10f;
     private float speed;
 
     // Start is called before the first frame update
     void Start()
     {
-        launch();
+        float x = transform.position.x;
+        float z = transform.position.z;
+
+        launch(x, z);
     }
 
     // Update is called once per frame
@@ -18,14 +22,14 @@ public class ball_control : MonoBehaviour
     {
         if ((transform.position.x > 13) ^ (transform.position.x < -13))
         {
-            launch();
+            launch(0, 0);
         }
     }
 
-    private void launch()
+    private void launch(float x, float z)
     {
 
-        transform.position = new Vector3(0f, .5f, 0f);
+        transform.position = new Vector3(x, .5f, z);
         speed = start_speed;
 
         float dirx = Random.Range(0, 2);
@@ -48,6 +52,27 @@ public class ball_control : MonoBehaviour
         if (coll.gameObject.tag == "paddles")
         {
             GetComponent<Rigidbody>().velocity *= 1.5f;
+        }
+    }
+
+    private void OnTriggerEnter(Collider col)
+    {
+        if (col.gameObject.tag == "power")
+        {
+            power pow = col.gameObject.GetComponent<power>();
+
+            if (pow.num == 0)
+            {
+                GetComponent<Rigidbody>().velocity *= 2f;
+            }
+            else
+            {
+                float x = transform.position.x;
+                float z = transform.position.z;
+
+                launch(x, z);
+                Instantiate(ball, new Vector3(x, 0, z), Quaternion.identity);
+            }
         }
     }
 }
